@@ -13,7 +13,8 @@ class IPC():
 
     def getMessages(client):
         if(client in IPC.clients):
-            return IPC.clients[client]
+            item = IPC.clients[client].get()
+            return item
 
         return None
     
@@ -25,8 +26,9 @@ class IPC():
         return False
 
     def sendToAll(msg):
+        print("Putting: " + str(msg))
         for client in IPC.clients:
-            client.put(msg)
+            IPC.clients[client].put(msg)
 
     def remove(client):
         if(client in IPC.clients):
