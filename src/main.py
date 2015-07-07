@@ -4,53 +4,54 @@ import time
 import sys
 import subprocess 
 
-fig = None
-ax1 = None
-host = None
-seconds = 0 
-xar = []
-yar = []
+from IPC import *
 
-def usage():
-    print("Usage: python3 main.py <hostname>")
-    quit(1)
+class Graph():
 
-def ping(hostname):
-    status, result = subprocess.getstatusoutput("ping -c1 " + str(hostname))
+    def __init__(self, host, fig, ax1):
+        self.fig        = fig 
+        self.ax1        = ax1 
+        self.host       = host 
+        self.seconds    = 0 
+        self.xar        = []
+        self.yar        = []
 
-    if(status == 0):
-        print("HOST IS UP")
-        time_string = result.split("time=")[1]
-        time = float(time_string.split(" ")[0])
-        return time
+        IPC.add(self)
 
-    else:
-        print("HOST IS DOWN")
-        return -1
+    def ping(self, hostname):
+        status, result  = subprocess.getstatusoutput("ping -c1 " + str(hostname))
 
-def animate(i):
-    global seconds
+        if(status == 0):
+            time_string = result.split("time=")[1]
+            time        = float(time_string.split(" ")[0])
+            return time
 
-    time = ping(host)
-    yar.append(time)
-    xar.append(seconds)
-    ax1.clear()
-    ax1.plot(xar,yar)
-    
-    seconds += 1
+        else:
+            return -1
 
-def main():
-    global fig, ax1, host
+    def animate(self, i):
 
-    if(len(sys.argv) != 2):
-        usage() 
+        time = self.ping(self.host)
+        self.yar.append(time)
+        self.xar.append(self.seconds)
+        self.ax1.clear()
+        self.ax1.plot(self.xar, self.yar)
+        
+        self.seconds += 1
 
-    host = sys.argv[1]
-    fig = plt.figure()
-    ax1 = fig.add_subplot(1,1,1)
-
-    ani = animation.FuncAnimation(fig, animate, interval=1000)
-    plt.show()
+    def draw(self):
+        ani         = animation.FuncAnimation(self.fig, self.animate, interval=1000)
+        plt.show()
 
 if __name__ == "__main__":
-    main()
+
+    if(len(sys.argv) != 2):
+        print("Usage: python3 main.py <hostname>")
+        quit(1)
+
+    host    = sys.argv[1]
+    fig     = plt.figure()
+    ax1     = fig.add_subplot(1,1,1)
+    graph   = Graph(host, fig, ax1)
+
+    graph.draw()
