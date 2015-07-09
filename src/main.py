@@ -3,8 +3,8 @@ import matplotlib.animation as animation
 import time
 import sys
 import subprocess 
-import ping
 import threading
+import ping
 
 from IPC import *
 
@@ -27,7 +27,6 @@ class Graph():
         self.xar.append(self.seconds)
         self.ax1.clear()
         self.ax1.plot(self.xar, self.yar)
-        
         self.seconds += 1
 
     def draw(self):
@@ -45,7 +44,7 @@ if __name__ == "__main__":
     ax1     = fig.add_subplot(1,1,1)
     graph   = Graph(host, fig, ax1)
 
-    t = threading.Thread(target=ping.ping(host))
+    t = threading.Thread(target=ping.ping, args=(host,))
     t.daemon = True
     t.start()
 
