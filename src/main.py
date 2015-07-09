@@ -5,6 +5,7 @@ import sys
 import subprocess 
 import threading
 import ping
+import argparse
 
 from IPC import *
 
@@ -33,19 +34,27 @@ class Graph():
         ani         = animation.FuncAnimation(self.fig, self.animate, interval=1000)
         plt.show()
 
-if __name__ == "__main__":
+def main():
+    parser = argparse.ArgumentParser(description = "The main file for running the graph.")
+    parser.add_argument("host", help = "The host to ping.")
+    parser.add_argument("interval", help = "The interval (in seconds) to ping.") 
 
-    if(len(sys.argv) != 2):
-        print("Usage: python3 main.py <hostname>")
-        quit(1)
+    args        = parser.parse_args()
+    host        = args.host
+    interval    = args.interval
 
-    host    = sys.argv[1]
-    fig     = plt.figure()
-    ax1     = fig.add_subplot(1,1,1)
-    graph   = Graph(host, fig, ax1)
+    fig         = plt.figure()
+    ax1         = fig.add_subplot(1,1,1)
+    graph       = Graph(host, fig, ax1)
 
-    t = threading.Thread(target=ping.ping, args=(host,))
-    t.daemon = True
+    t           = threading.Thread(target=ping.ping, args=(host, interval,))
+    t.daemon    = True
     t.start()
 
     graph.draw()
+
+if __name__ == "__main__":
+    main()
+
+
+    
